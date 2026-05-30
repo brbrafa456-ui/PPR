@@ -1000,6 +1000,90 @@
     .sel-required{font-size:9px;color:#e8001c;letter-spacing:1px;text-transform:uppercase;margin-left:6px;opacity:0;transition:opacity .2s;}
     .shake-err .sel-required{opacity:1;}
 
+    /* ── MOBILE ACCORDION ── */
+    .mob-acc-trigger{
+      display:flex;align-items:center;justify-content:space-between;
+      width:100%;
+    }
+    .mob-acc-arrow{
+      font-size:18px;color:var(--muted);
+      transition:transform .3s cubic-bezier(.22,1,.36,1);
+      display:inline-block;flex-shrink:0;
+    }
+    .mob-acc-item.open .mob-acc-arrow{transform:rotate(90deg);}
+    .mob-acc-sub{
+      max-height:0;overflow:hidden;
+      transition:max-height .35s cubic-bezier(.22,1,.36,1);
+      background:rgba(255,255,255,.03);
+      border-bottom:1px solid var(--border);
+    }
+    .mob-acc-item.open .mob-acc-sub{max-height:400px;}
+    .mob-sub-inner{display:flex;flex-direction:column;}
+    .mob-sub-btn{
+      padding:10px 24px;font-size:11px;font-weight:500;letter-spacing:1.5px;
+      text-transform:uppercase;color:#888;background:none;border:none;
+      text-align:left;cursor:pointer;font-family:var(--fb);
+      transition:color .15s,background .15s;
+      border-bottom:1px solid rgba(255,255,255,.04);
+    }
+    .mob-sub-btn:hover{color:var(--white);background:rgba(232,0,28,.07);}
+    .mob-sub-all{
+      padding:9px 24px;font-size:10px;font-weight:700;letter-spacing:2px;
+      text-transform:uppercase;color:var(--red);background:none;border:none;
+      text-align:left;cursor:pointer;font-family:var(--fb);
+      border-top:1px solid rgba(232,0,28,.15);
+      margin-top:2px;
+    }
+
+    /* ── ADMIN NOVAS ABAS ── */
+    .adm-stat-card{
+      background:#111;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:1.2rem 1.4rem;
+    }
+    .adm-stat-num{font-family:Anton,sans-serif;font-size:32px;color:#e8001c;margin-bottom:2px;}
+    .adm-stat-label{font-size:10px;color:#555;letter-spacing:2px;text-transform:uppercase;}
+    .adm-user-row{
+      display:flex;align-items:center;gap:14px;
+      background:#111;border:1px solid rgba(255,255,255,.07);border-radius:10px;
+      padding:12px 16px;margin-bottom:8px;transition:border-color .2s;
+    }
+    .adm-user-row:hover{border-color:rgba(232,0,28,.25);}
+    .adm-user-avatar{
+      width:40px;height:40px;border-radius:50%;background:#e8001c;
+      display:flex;align-items:center;justify-content:center;
+      font-family:Anton,sans-serif;font-size:16px;flex-shrink:0;
+    }
+    .adm-user-info{flex:1;}
+    .adm-user-name{font-size:13px;font-weight:500;}
+    .adm-user-email{font-size:10px;color:#555;letter-spacing:1px;margin-top:2px;}
+    .adm-user-badge{
+      font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+      padding:3px 8px;border-radius:3px;
+    }
+    .adm-badge-active{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3);}
+    .adm-badge-inactive{background:rgba(255,255,255,.06);color:#555;border:1px solid rgba(255,255,255,.1);}
+    /* subcategoria tag no painel */
+    .adm-subcat-tag{
+      display:inline-flex;align-items:center;gap:5px;
+      background:#1a1a1a;border:1px solid rgba(255,255,255,.1);
+      border-radius:20px;padding:4px 10px 4px 12px;
+      font-size:10px;color:#ccc;letter-spacing:1px;margin:3px;
+    }
+    .adm-subcat-tag button{
+      background:none;border:none;color:#555;cursor:pointer;font-size:13px;line-height:1;padding:0;
+      transition:color .15s;
+    }
+    .adm-subcat-tag button:hover{color:#e8001c;}
+
+    /* chart relatorio */
+    .rel-bar-wrap{display:flex;align-items:flex-end;gap:6px;height:120px;margin-top:.5rem;}
+    .rel-bar{
+      flex:1;background:rgba(232,0,28,.18);border-radius:4px 4px 0 0;
+      position:relative;min-width:20px;transition:background .2s;cursor:default;
+    }
+    .rel-bar:hover{background:rgba(232,0,28,.4);}
+    .rel-bar-label{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-size:8px;color:#555;letter-spacing:1px;text-transform:uppercase;}
+    .rel-bar-val{position:absolute;top:-18px;left:0;right:0;text-align:center;font-size:9px;color:#e8001c;font-weight:700;}
+
     /* ── ADMIN MOBILE ── */
     @media(max-width:700px){
       #admin-painel > div:nth-child(2){
@@ -1051,12 +1135,67 @@
     <span class="mob-drawer-logo">PPR <span class="accent">LOJA</span></span>
     <button class="mob-drawer-close" onclick="closeMobDrawer()">&#10005;</button>
   </div>
-  <button class="mob-drawer-item" onclick="closeMobDrawer();goPage('colecao','camisetas')">Camisetas <span class="mob-drawer-plus">+</span></button>
-  <button class="mob-drawer-item" onclick="closeMobDrawer();goPage('colecao','moletons')">Inverno <span class="mob-drawer-plus">+</span></button>
-  <button class="mob-drawer-item" onclick="closeMobDrawer();goPage('colecao')">Acessórios <span class="mob-drawer-plus">+</span></button>
-  <button class="mob-drawer-item" onclick="closeMobDrawer();goPage('colecao','calcas')">Calças</button>
-  <button class="mob-drawer-item" onclick="closeMobDrawer();goPage('colecao','shorts')">Shorts</button>
-  <button class="mob-drawer-item" onclick="closeMobDrawer();goPage('colecao','eletronicos')">Eletrônicos <span class="mob-drawer-plus">+</span></button>
+
+  <!-- Camisetas accordion -->
+  <div class="mob-acc-item" id="mob-acc-camisetas">
+    <button class="mob-drawer-item mob-acc-trigger" onclick="toggleMobAcc('camisetas')">
+      <span>Camisetas</span>
+      <span class="mob-acc-arrow">›</span>
+    </button>
+    <div class="mob-acc-sub" id="mob-sub-camisetas">
+      <div class="mob-sub-inner" id="mob-sub-inner-camisetas"><!-- gerado pelo JS --></div>
+      <button class="mob-sub-all" onclick="closeMobDrawer();goPage('colecao','camisetas')">Ver todas →</button>
+    </div>
+  </div>
+
+  <!-- Moletons accordion -->
+  <div class="mob-acc-item" id="mob-acc-moletons">
+    <button class="mob-drawer-item mob-acc-trigger" onclick="toggleMobAcc('moletons')">
+      <span>Moletons / Inverno</span>
+      <span class="mob-acc-arrow">›</span>
+    </button>
+    <div class="mob-acc-sub" id="mob-sub-moletons">
+      <div class="mob-sub-inner" id="mob-sub-inner-moletons"></div>
+      <button class="mob-sub-all" onclick="closeMobDrawer();goPage('colecao','moletons')">Ver todos →</button>
+    </div>
+  </div>
+
+  <!-- Calças accordion -->
+  <div class="mob-acc-item" id="mob-acc-calcas">
+    <button class="mob-drawer-item mob-acc-trigger" onclick="toggleMobAcc('calcas')">
+      <span>Calças / Shorts</span>
+      <span class="mob-acc-arrow">›</span>
+    </button>
+    <div class="mob-acc-sub" id="mob-sub-calcas">
+      <div class="mob-sub-inner" id="mob-sub-inner-calcas"></div>
+      <button class="mob-sub-all" onclick="closeMobDrawer();goPage('colecao','calcas')">Ver todas →</button>
+    </div>
+  </div>
+
+  <!-- Acessórios accordion -->
+  <div class="mob-acc-item" id="mob-acc-acessorios">
+    <button class="mob-drawer-item mob-acc-trigger" onclick="toggleMobAcc('acessorios')">
+      <span>Acessórios</span>
+      <span class="mob-acc-arrow">›</span>
+    </button>
+    <div class="mob-acc-sub" id="mob-sub-acessorios">
+      <div class="mob-sub-inner" id="mob-sub-inner-acessorios"></div>
+      <button class="mob-sub-all" onclick="closeMobDrawer();goPage('colecao')">Ver todos →</button>
+    </div>
+  </div>
+
+  <!-- Eletrônicos accordion -->
+  <div class="mob-acc-item" id="mob-acc-eletronicos">
+    <button class="mob-drawer-item mob-acc-trigger" onclick="toggleMobAcc('eletronicos')">
+      <span>Eletrônicos</span>
+      <span class="mob-acc-arrow">›</span>
+    </button>
+    <div class="mob-acc-sub" id="mob-sub-eletronicos">
+      <div class="mob-sub-inner" id="mob-sub-inner-eletronicos"></div>
+      <button class="mob-sub-all" onclick="closeMobDrawer();goPage('colecao','eletronicos')">Ver todos →</button>
+    </div>
+  </div>
+
   <div class="mob-drawer-footer" onclick="abrirModalConta()">
     <span style="font-size:18px;">&#128100;</span> Entrar / Registrar
   </div>
@@ -2864,14 +3003,19 @@
   }
 
   function admTab(t) {
-    document.getElementById('adm-produtos').style.display = t === 'produtos' ? 'block' : 'none';
-    document.getElementById('adm-pedidos').style.display  = t === 'pedidos'  ? 'block' : 'none';
-    document.getElementById('adm-config').style.display   = t === 'config'   ? 'block' : 'none';
-    document.getElementById('adm-imagens').style.display  = t === 'imagens'  ? 'block' : 'none';
+    const allTabs = ['produtos','pedidos','categorias','relatorios','usuarios','imagens','config'];
+    allTabs.forEach(tab => {
+      const el = document.getElementById('adm-' + tab);
+      if (el) el.style.display = t === tab ? 'block' : 'none';
+    });
     if (t === 'imagens') loadImgsPanel();
     if (t === 'pedidos') admRenderPedidos();
+    if (t === 'categorias') { if(typeof admRenderCategorias==='function') admRenderCategorias(); }
+    if (t === 'relatorios') { if(typeof admRenderRelatorios==='function') admRenderRelatorios(); }
+    if (t === 'usuarios')   { if(typeof admLoadUsuarios==='function')   admLoadUsuarios(); }
     document.querySelectorAll('.adm-tab').forEach(b => b.classList.remove('active'));
-    document.getElementById('adm-tab-' + t).classList.add('active');
+    const tabEl = document.getElementById('adm-tab-' + t);
+    if (tabEl) tabEl.classList.add('active');
   }
 
   function admRenderPedidos() {
@@ -3279,6 +3423,9 @@
     <div style="display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.07);padding:0 1rem;background:#0d0d0d;overflow-x:auto;-webkit-overflow-scrolling:touch;">
       <button class="adm-tab active" id="adm-tab-produtos" onclick="admTab('produtos')">📦 Produtos</button>
       <button class="adm-tab" id="adm-tab-pedidos" onclick="admTab('pedidos')">🧾 Pedidos</button>
+      <button class="adm-tab" id="adm-tab-categorias" onclick="admTab('categorias')">🗂 Categorias</button>
+      <button class="adm-tab" id="adm-tab-relatorios" onclick="admTab('relatorios')">📊 Relatórios</button>
+      <button class="adm-tab" id="adm-tab-usuarios" onclick="admTab('usuarios')">👥 Usuários</button>
       <button class="adm-tab" id="adm-tab-imagens" onclick="admTab('imagens')">🖼️ Imagens</button>
       <button class="adm-tab" id="adm-tab-config" onclick="admTab('config')">⚙️ Config</button>
     </div>
@@ -3301,6 +3448,38 @@
       <div id="adm-pedidos-list"></div>
     </div>
 
+
+    <!-- aba categorias -->
+    <div id="adm-categorias" style="padding:2rem 2.5rem;display:none;">
+      <div style="font-family:Anton,sans-serif;font-size:22px;margin-bottom:1.5rem;">Categorias &amp; Subcategorias</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.2rem;" id="adm-cat-grid">
+        <!-- gerado por JS -->
+      </div>
+    </div>
+
+    <!-- aba relatórios -->
+    <div id="adm-relatorios" style="padding:2rem 2.5rem;display:none;">
+      <div style="font-family:Anton,sans-serif;font-size:22px;margin-bottom:1.5rem;">Relatórios de Vendas</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;" id="adm-rel-stats"></div>
+      <div style="background:#111;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:1.4rem;margin-bottom:1.5rem;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e8001c;margin-bottom:1.2rem;">📈 Vendas por Mês</div>
+        <div class="rel-bar-wrap" id="adm-rel-chart"></div>
+        <div style="height:24px;"></div>
+      </div>
+      <div style="background:#111;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:1.4rem;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e8001c;margin-bottom:1rem;">🏆 Top Produtos</div>
+        <div id="adm-rel-top"></div>
+      </div>
+    </div>
+
+    <!-- aba usuários -->
+    <div id="adm-usuarios" style="padding:2rem 2.5rem;display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px;">
+        <div style="font-family:Anton,sans-serif;font-size:22px;">Usuários</div>
+        <button onclick="admLoadUsuarios()" style="padding:8px 16px;background:#1a1a1a;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#ccc;font-size:10px;cursor:pointer;letter-spacing:1px;">🔄 Atualizar</button>
+      </div>
+      <div id="adm-user-list"><p style="color:#555;font-size:13px;">Clique em "Atualizar" para carregar usuários.</p></div>
+    </div>
 
     <!-- aba imagens -->
     <div id="adm-imagens" style="padding:2rem 2.5rem;display:none;">
@@ -3528,11 +3707,17 @@
         </div>
         <div>
           <label class="adm-label">Categoria</label>
-          <select class="adm-input" id="adm-cat">
+          <select class="adm-input" id="adm-cat" onchange="admUpdateSubcatSelect()">
             <option value="camisetas">Camisetas</option>
             <option value="moletons">Moletons</option>
             <option value="calcas">Calças</option>
             <option value="eletronicos">Eletrônicos</option>
+          </select>
+        </div>
+        <div>
+          <label class="adm-label">Subcategoria — opcional</label>
+          <select class="adm-input" id="adm-subcat">
+            <option value="">Sem subcategoria</option>
           </select>
         </div>
         <div>
@@ -4078,7 +4263,73 @@ function closeMobDrawer() {
   document.getElementById('mob-drawer').classList.remove('open');
   document.getElementById('mob-drawer-overlay').classList.remove('open');
   document.body.style.overflow = '';
+  // fecha todos os accordions
+  document.querySelectorAll('.mob-acc-item.open').forEach(el => el.classList.remove('open'));
 }
+
+/* ── accordion mobile ── */
+function toggleMobAcc(cat) {
+  const item = document.getElementById('mob-acc-' + cat);
+  if (!item) return;
+  const wasOpen = item.classList.contains('open');
+  // fecha todos
+  document.querySelectorAll('.mob-acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!wasOpen) {
+    item.classList.add('open');
+    renderMobSubcats(cat);
+  }
+}
+
+function renderMobSubcats(cat) {
+  const inner = document.getElementById('mob-sub-inner-' + cat);
+  if (!inner) return;
+  const cats = JSON.parse(localStorage.getItem('ppr_categorias') || '{}');
+  const subs = (cats[cat] && cats[cat].subcategorias) ? cats[cat].subcategorias : [];
+  if (!subs.length) {
+    inner.innerHTML = '<button class="mob-sub-btn" onclick="closeMobDrawer();filterCat(\'' + cat + '\');goPage(\'colecao\')">Todos os ' + cat + '</button>';
+    return;
+  }
+  inner.innerHTML = subs.map(s =>
+    `<button class="mob-sub-btn" onclick="closeMobDrawer();mobNavSubcat('${cat}','${s}')">${s}</button>`
+  ).join('');
+}
+
+// navega para coleção filtrada por subcategoria
+function mobNavSubcat(cat, sub) {
+  goPage('colecao', cat);
+  // aplica filtro de subcategoria (visual apenas — filtra por subcat se produto tiver)
+  currentSubcat = sub;
+  renderProducts();
+}
+
+let currentSubcat = null;
+
+/* sobrescreve filterCat para limpar subcat */
+const _origFilterCat = filterCat;
+filterCat = function(cat) {
+  currentSubcat = null;
+  _origFilterCat(cat);
+};
+
+/* sobrescreve renderProducts para filtrar por subcat quando ativo */
+const _origRenderProducts = renderProducts;
+renderProducts = function() {
+  if (!currentSubcat) { _origRenderProducts(); return; }
+  const filtroSalvo = filtroAtivo;
+  // filtra temporariamente por subcat
+  const original = [...PRODUTOS];
+  const filtered = PRODUTOS.filter(p => {
+    if (p.category !== filtroSalvo && filtroSalvo !== 'todos') return false;
+    return p.subcategoria === currentSubcat;
+  });
+  if (filtered.length === 0) { _origRenderProducts(); return; }
+  // swap temporario
+  PRODUTOS.length = 0; filtered.forEach(p => PRODUTOS.push(p));
+  const prevFiltro = filtroAtivo; filtroAtivo = 'todos';
+  _origRenderProducts();
+  filtroAtivo = prevFiltro;
+  PRODUTOS.length = 0; original.forEach(p => PRODUTOS.push(p));
+};
 
 /* busca mobile — reutiliza o botão de busca existente */
 const mobSearchBtn = document.getElementById('mob-search-btn');
@@ -4117,6 +4368,229 @@ function mobAnnShow(idx) {
 function mobAnnNext() { _annIdx = (_annIdx + 1) % MOB_ANNOUNCES.length; mobAnnShow(_annIdx); }
 function mobAnnPrev() { _annIdx = (_annIdx - 1 + MOB_ANNOUNCES.length) % MOB_ANNOUNCES.length; mobAnnShow(_annIdx); }
 setInterval(mobAnnNext, 3500);
+
+/* inicializa subcats no drawer quando abrir */
+document.getElementById('mob-hamburger') && document.querySelector('.mob-hamburger') &&
+  document.querySelector('.mob-hamburger').addEventListener('click', () => {
+    ['camisetas','moletons','calcas','acessorios','eletronicos'].forEach(c => renderMobSubcats(c));
+  });
+// também pre-render ao carregar
+setTimeout(() => {
+  ['camisetas','moletons','calcas','acessorios','eletronicos'].forEach(c => renderMobSubcats(c));
+}, 500);
+</script>
+
+<script>
+/* ══════════════════════════════════════
+   ADMIN — NOVAS FUNÇÕES
+══════════════════════════════════════ */
+
+/* ══════════════════════════════════════
+   CATEGORIAS & SUBCATEGORIAS
+══════════════════════════════════════ */
+function admGetCategorias() {
+  const defaults = {
+    camisetas:   { label:'Camisetas',   icon:'👕', subcategorias:[] },
+    moletons:    { label:'Moletons',    icon:'🧥', subcategorias:[] },
+    calcas:      { label:'Calças',      icon:'👖', subcategorias:[] },
+    shorts:      { label:'Shorts',      icon:'🩳', subcategorias:[] },
+    eletronicos: { label:'Eletrônicos', icon:'🎧', subcategorias:[] },
+    acessorios:  { label:'Acessórios',  icon:'🎩', subcategorias:[] },
+  };
+  const saved = JSON.parse(localStorage.getItem('ppr_categorias') || '{}');
+  return Object.assign({}, defaults, saved);
+}
+function admSaveCategorias(cats) {
+  localStorage.setItem('ppr_categorias', JSON.stringify(cats));
+  // atualiza drawer mobile
+  ['camisetas','moletons','calcas','acessorios','eletronicos'].forEach(c => renderMobSubcats(c));
+}
+
+function admRenderCategorias() {
+  const cats = admGetCategorias();
+  const grid = document.getElementById('adm-cat-grid');
+  grid.innerHTML = Object.entries(cats).map(([key, cat]) => `
+    <div style="background:#111;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:1.3rem;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+        <span style="font-size:22px;">${cat.icon}</span>
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e8001c;">${cat.label}</div>
+      </div>
+      <div style="margin-bottom:.8rem;">
+        <div style="font-size:10px;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem;">Subcategorias:</div>
+        <div id="subcat-tags-${key}" style="display:flex;flex-wrap:wrap;min-height:32px;">${(cat.subcategorias||[]).map((s,i) => `<span class="adm-subcat-tag">${s}<button onclick="admRemoveSubcat('${key}',${i})">✕</button></span>`).join('')}</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input class="adm-input" id="subcat-input-${key}" type="text" placeholder="Nova subcategoria..." style="flex:1;font-size:12px;padding:7px 10px;"
+          onkeydown="if(event.key==='Enter')admAddSubcat('${key}')"/>
+        <button onclick="admAddSubcat('${key}')" class="adm-btn-save" style="padding:7px 12px;">+ Add</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function admAddSubcat(catKey) {
+  const inp = document.getElementById('subcat-input-' + catKey);
+  const val = inp.value.trim();
+  if (!val) return;
+  const cats = admGetCategorias();
+  if (!cats[catKey]) return;
+  if (!cats[catKey].subcategorias) cats[catKey].subcategorias = [];
+  if (!cats[catKey].subcategorias.includes(val)) {
+    cats[catKey].subcategorias.push(val);
+    admSaveCategorias(cats);
+    admRenderCategorias();
+    admUpdateSubcatSelect();
+    showToast('Subcategoria adicionada! ✓');
+  }
+  inp.value = '';
+}
+
+function admRemoveSubcat(catKey, idx) {
+  const cats = admGetCategorias();
+  if (!cats[catKey] || !cats[catKey].subcategorias) return;
+  cats[catKey].subcategorias.splice(idx, 1);
+  admSaveCategorias(cats);
+  admRenderCategorias();
+  admUpdateSubcatSelect();
+  showToast('Subcategoria removida.');
+}
+
+function admUpdateSubcatSelect() {
+  const sel = document.getElementById('adm-subcat');
+  if (!sel) return;
+  const cat = document.getElementById('adm-cat')?.value;
+  const cats = admGetCategorias();
+  const subs = (cats[cat] && cats[cat].subcategorias) ? cats[cat].subcategorias : [];
+  sel.innerHTML = '<option value="">Sem subcategoria</option>' + subs.map(s => `<option value="${s}">${s}</option>`).join('');
+}
+
+/* hook admNewProduct e admEditProduct para subcat */
+const _origAdmNewProduct = admNewProduct;
+admNewProduct = function() {
+  _origAdmNewProduct();
+  admUpdateSubcatSelect();
+  const sel = document.getElementById('adm-subcat');
+  if (sel) sel.value = '';
+};
+const _origAdmEditProduct = admEditProduct;
+admEditProduct = function(id) {
+  _origAdmEditProduct(id);
+  admUpdateSubcatSelect();
+  const p = PRODUTOS.find(x => x.id === id);
+  const sel = document.getElementById('adm-subcat');
+  if (sel && p) sel.value = p.subcategoria || '';
+};
+const _origAdmSaveProduct = admSaveProduct;
+admSaveProduct = async function() {
+  const subcat = document.getElementById('adm-subcat')?.value || '';
+  const editingId = admEditId;
+  await _origAdmSaveProduct();
+  // injeta subcategoria
+  if (subcat !== undefined) {
+    const idx = editingId
+      ? PRODUTOS.findIndex(p => p.id === editingId)
+      : PRODUTOS.length - 1;
+    if (idx >= 0) {
+      PRODUTOS[idx].subcategoria = subcat;
+      localStorage.setItem('ppr_produtos', JSON.stringify(PRODUTOS));
+    }
+  }
+};
+
+/* ══════════════════════════════════════
+   RELATÓRIOS
+══════════════════════════════════════ */
+function admRenderRelatorios() {
+  const pedidos = JSON.parse(localStorage.getItem('ppr_pedidos') || '[]');
+  const total = pedidos.reduce((s, p) => s + (parseFloat(p.total) || 0), 0);
+  const pagos  = pedidos.filter(p => p.status === 'pago');
+  const totalPago = pagos.reduce((s, p) => s + (parseFloat(p.total) || 0), 0);
+
+  // stats cards
+  document.getElementById('adm-rel-stats').innerHTML = `
+    <div class="adm-stat-card"><div class="adm-stat-num">${pedidos.length}</div><div class="adm-stat-label">Pedidos totais</div></div>
+    <div class="adm-stat-card"><div class="adm-stat-num">${pagos.length}</div><div class="adm-stat-label">Pedidos pagos</div></div>
+    <div class="adm-stat-card"><div class="adm-stat-num">R$ ${totalPago.toFixed(0)}</div><div class="adm-stat-label">Receita confirmada</div></div>
+    <div class="adm-stat-card"><div class="adm-stat-num">${PRODUTOS.length}</div><div class="adm-stat-label">Produtos cadastrados</div></div>
+  `;
+
+  // gráfico mensal
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const porMes = new Array(12).fill(0);
+  pedidos.forEach(p => {
+    const d = new Date(p.data ? p.data.split(' ')[0].split('/').reverse().join('-') : Date.now());
+    if (!isNaN(d)) porMes[d.getMonth()] += (parseFloat(p.total) || 0);
+  });
+  const maxVal = Math.max(...porMes, 1);
+  document.getElementById('adm-rel-chart').innerHTML = porMes.map((v, i) => `
+    <div class="rel-bar" style="height:${Math.max(4, (v/maxVal)*100)}%" title="R$ ${v.toFixed(0)}">
+      <span class="rel-bar-val">${v > 0 ? 'R$' + v.toFixed(0) : ''}</span>
+      <span class="rel-bar-label">${meses[i]}</span>
+    </div>
+  `).join('');
+
+  // top produtos
+  const contagem = {};
+  pedidos.forEach(p => {
+    if (!p.items) return;
+    p.items.split(',').forEach(item => {
+      const m = item.match(/(.+) ×(\d+)/);
+      if (m) { const k = m[1].trim(); contagem[k] = (contagem[k]||0) + parseInt(m[2]); }
+    });
+  });
+  const top = Object.entries(contagem).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const maxQ = top.length ? top[0][1] : 1;
+  document.getElementById('adm-rel-top').innerHTML = top.length
+    ? top.map(([name, qty], i) => `
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+        <div style="font-family:Anton,sans-serif;font-size:16px;color:#e8001c;width:20px;text-align:center;">${i+1}</div>
+        <div style="flex:1;">
+          <div style="font-size:12px;font-weight:500;margin-bottom:4px;">${name}</div>
+          <div style="height:4px;border-radius:2px;background:#1a1a1a;overflow:hidden;">
+            <div style="height:100%;background:#e8001c;width:${(qty/maxQ*100).toFixed(0)}%;transition:width .4s;"></div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#555;">${qty} un</div>
+      </div>`)
+    .join('')
+    : '<p style="color:#555;font-size:13px;">Nenhum pedido registrado ainda.</p>';
+}
+
+/* ══════════════════════════════════════
+   USUÁRIOS
+══════════════════════════════════════ */
+async function admLoadUsuarios() {
+  const list = document.getElementById('adm-user-list');
+  list.innerHTML = '<p style="color:#555;font-size:13px;">⏳ Carregando usuários...</p>';
+  try {
+    const users = await sb('GET', 'usuarios', null, '?order=criado_em.desc');
+    if (!users.length) {
+      list.innerHTML = '<p style="color:#555;font-size:13px;">Nenhum usuário cadastrado ainda.</p>';
+      return;
+    }
+    list.innerHTML = users.map(u => `
+      <div class="adm-user-row">
+        <div class="adm-user-avatar">${(u.nome||'?')[0].toUpperCase()}</div>
+        <div class="adm-user-info">
+          <div class="adm-user-name">${u.nome || '—'}</div>
+          <div class="adm-user-email">${u.email} &nbsp;·&nbsp; ${u.criado_em ? new Date(u.criado_em).toLocaleDateString('pt-BR') : '—'}</div>
+        </div>
+        <span class="adm-user-badge ${u.ativo === false ? 'adm-badge-inactive' : 'adm-badge-active'}">${u.ativo === false ? 'Inativo' : 'Ativo'}</span>
+        <button onclick="admToggleUsuario('${u.id}', ${!u.ativo})" class="adm-btn-edit" style="flex-shrink:0;">${u.ativo === false ? '✅ Ativar' : '🚫 Bloquear'}</button>
+      </div>
+    `).join('');
+  } catch(e) {
+    list.innerHTML = '<p style="color:#e8001c;font-size:13px;">Erro ao carregar usuários (verifique conexão com Supabase).</p>';
+  }
+}
+
+async function admToggleUsuario(id, novoStatus) {
+  try {
+    await sb('PATCH', 'usuarios', { ativo: novoStatus }, `?id=eq.${id}`);
+    admLoadUsuarios();
+    showToast(novoStatus ? 'Usuário ativado. ✓' : 'Usuário bloqueado.');
+  } catch(e) { showToast('Erro ao atualizar usuário.'); }
+}
 </script>
 </body>
 </html>
