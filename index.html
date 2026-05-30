@@ -2006,7 +2006,7 @@
     if (cep.replace(/\D/g,'').length !== 8) { err.textContent='CEP inválido (8 dígitos).'; err.style.display='block'; return; }
     if (senha.length < 6)           { err.textContent='Senha mínimo 6 caracteres.';        err.style.display='block'; return; }
 
-    localStorage.setItem('ppr_dados_cliente', JSON.stringify({ cpf, email, cep }));
+    sessionStorage.setItem('ppr_dados_cliente', JSON.stringify({ cpf, email, cep }));
     fecharConfirm();
     abrirPagamentoReal();
   }
@@ -2216,27 +2216,8 @@
 
   /* ── confirmação ── */
   function salvarPedido(tipo) {
-    const pedidos = JSON.parse(localStorage.getItem('ppr_pedidos') || '[]');
-    const historico = JSON.parse(localStorage.getItem('ppr_historico') || '[]');
-    const items = Object.values(cart);
-    const total = getTotal();
-    const dados = JSON.parse(localStorage.getItem('ppr_dados_cliente') || '{}');
-    const numPedido = 'PPR' + Date.now().toString().slice(-6);
-    const pedido = {
-      num: numPedido,
-      data: new Date().toLocaleString('pt-BR'),
-      tipo,
-      total,
-      status: 'aguardando',
-      cpf: dados.cpf || '—',
-      email: dados.email || '—',
-      cep: dados.cep || '—',
-      items: items.map(i => `${i.icon} ${i.name} ×${i.qty}`).join(', ')
-    };
-    pedidos.unshift(pedido);
-    localStorage.setItem('ppr_pedidos', JSON.stringify(pedidos.slice(0,100)));
-    historico.unshift({ data: new Date().toLocaleDateString('pt-BR'), tipo, total, items: pedido.items });
-    localStorage.setItem('ppr_historico', JSON.stringify(historico.slice(0, 20)));
+    // Stub: persiste pedidos via Supabase (override no bloco Supabase abaixo)
+    // mantido para evitar erro de referência
   }
 
   function confirmarPagamento(tipo) {
@@ -2348,10 +2329,10 @@
   /* ══════════════════════════════════════
      WISHLIST
   ══════════════════════════════════════ */
-  let wishlist = JSON.parse(localStorage.getItem('ppr_wishlist') || '[]');
+  let wishlist = []; // carregado do Supabase em initSupabase
 
   function saveWishlist() {
-    localStorage.setItem('ppr_wishlist', JSON.stringify(wishlist));
+    // wishlist persiste via Supabase (override no bloco Supabase)
     const cnt = document.getElementById('wish-count');
     if (wishlist.length > 0) { cnt.style.display='flex'; cnt.textContent=wishlist.length; }
     else { cnt.style.display='none'; }
@@ -2426,20 +2407,22 @@
     8: [{autor:'Felipe N.',stars:4,texto:'Smartwatch ótimo, bom custo-benefício.'}],
   };
 
-  function getReviews(prodId) {
-    const saved = JSON.parse(localStorage.getItem('ppr_reviews') || '{}');
-    return [...(REVIEWS_SEED[prodId] || []), ...(saved[prodId] || [])];
+  async function getReviews(prodId) {
+    const seed = REVIEWS_SEED[prodId] || [];
+    try {
+      const rows = await sb('GET', 'reviews', null, `?produto_id=eq.${prodId}&order=criado_em.desc`);
+      return [...seed, ...rows.map(r => ({ autor: r.autor, stars: r.stars, texto: r.texto }))];
+    } catch(e) { return seed; }
   }
 
-  function saveReview(prodId, review) {
-    const saved = JSON.parse(localStorage.getItem('ppr_reviews') || '{}');
-    if (!saved[prodId]) saved[prodId] = [];
-    saved[prodId].unshift(review);
-    localStorage.setItem('ppr_reviews', JSON.stringify(saved));
+  async function saveReview(prodId, review) {
+    try {
+      await sb('POST', 'reviews', { produto_id: prodId, autor: review.autor, stars: review.stars, texto: review.texto });
+    } catch(e) { console.warn('Review nao salva:', e); }
   }
 
-  function renderReviews(prodId) {
-    const reviews = getReviews(prodId);
+  async function renderReviews(prodId) {
+    const reviews = await getReviews(prodId);
     const avg = reviews.length ? (reviews.reduce((s,r) => s + r.stars, 0) / reviews.length).toFixed(1) : '–';
     const starsDisp = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
     const el = document.getElementById('pm-reviews-section');
@@ -2475,12 +2458,12 @@
     });
   }
 
-  function submitReview(prodId) {
+  async function submitReview(prodId) {
     const texto = document.getElementById('review-text')?.value.trim();
     if (!texto) { showToast('Escreva algo na avaliação!'); return; }
     const nome = usuarioLogado ? (usuarioLogado.nome || usuarioLogado.email.split('@')[0]) : 'Anônimo';
-    saveReview(prodId, { autor: nome, stars: reviewStar, texto });
-    renderReviews(prodId);
+    await saveReview(prodId, { autor: nome, stars: reviewStar, texto });
+    await renderReviews(prodId);
     showToast('Avaliação enviada! ⭐');
   }
 
@@ -2852,18 +2835,7 @@
   const ADMIN_PW_DEFAULT = 'ppr2025';
   let admEditId = null;
 
-  // carrega produtos do localStorage se existir
-  (function() {
-    const saved = localStorage.getItem('ppr_produtos');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      PRODUTOS.length = 0;
-      parsed.forEach(p => PRODUTOS.push(p));
-    }
-    const cfg = JSON.parse(localStorage.getItem('ppr_config') || '{}');
-    if (cfg.pix)   PIX_CHAVE = cfg.pix;   // nota: PIX_CHAVE é let abaixo
-    if (cfg.nome)  PIX_NOME  = cfg.nome;
-  })();
+  // produtos e config carregados do Supabase em initSupabase()
 
 
   /* ══════════════════════════════════════
@@ -2879,7 +2851,7 @@
   }
 
   function loadImgsPanel() {
-    const imgs = JSON.parse(localStorage.getItem('ppr_imgs') || '{}');
+    const imgs = JSON.parse(localStorage.getItem('ppr_imgs') || '{}'); // cache local preenchido pelo initSupabase
     const setVal = (id, val) => { const el = document.getElementById(id); if(el && val) el.value = val; };
     const setPrev = (prevId, val) => { const el = document.getElementById(prevId); if(el && val) el.src = val; };
 
@@ -2937,7 +2909,6 @@
       const v = getVal('img-news'+i); if (v) imgs['news'+i] = v;
     }
 
-    localStorage.setItem('ppr_imgs', JSON.stringify(imgs));
     applyImgs();
 
     // Salvar no Supabase
@@ -3018,48 +2989,7 @@
     if (tabEl) tabEl.classList.add('active');
   }
 
-  function admRenderPedidos() {
-    const pedidos = JSON.parse(localStorage.getItem('ppr_pedidos') || '[]');
-    const list = document.getElementById('adm-pedidos-list');
-    if (!pedidos.length) {
-      list.innerHTML = '<p style="color:#555;font-size:13px;">Nenhum pedido registrado ainda.</p>';
-      return;
-    }
-    list.innerHTML = pedidos.map((p, i) => `
-      <div class="pedido-row" id="pedido-row-${i}">
-        <div class="pedido-head">
-          <span class="pedido-num">#${p.num}</span>
-          <span class="pedido-status status-${p.status}">${p.status === 'aguardando' ? '⏳ Aguardando' : p.status === 'pago' ? '✅ Pago' : '❌ Cancelado'}</span>
-          <span style="font-size:11px;color:#555;">${p.data}</span>
-          <span style="font-family:Anton,sans-serif;font-size:18px;color:#e8001c;">R$ ${p.total}</span>
-        </div>
-        <div class="pedido-info">
-          <span>📧 ${p.email}</span> &nbsp;|&nbsp; <span>🪪 ${p.cpf}</span> &nbsp;|&nbsp; <span>📬 ${p.cep}</span> &nbsp;|&nbsp; <span>${p.tipo === 'pix' ? '🟢 Pix' : '💳 Cartão'}</span>
-          <br>${p.items}
-        </div>
-        <div class="pedido-actions">
-          ${p.status !== 'pago'      ? `<button class="btn-pago"    onclick="admSetStatus(${i},'pago')">✅ Marcar como Pago</button>` : ''}
-          ${p.status !== 'cancelado' ? `<button class="btn-cancelar" onclick="admSetStatus(${i},'cancelado')">❌ Cancelar</button>` : ''}
-          ${p.status !== 'aguardando'? `<button class="btn-cancelar" style="background:none;border-color:rgba(255,255,255,.1);color:#555;" onclick="admSetStatus(${i},'aguardando')">↩ Aguardando</button>` : ''}
-        </div>
-      </div>
-    `).join('');
-  }
-
-  function admSetStatus(idx, status) {
-    const pedidos = JSON.parse(localStorage.getItem('ppr_pedidos') || '[]');
-    if (!pedidos[idx]) return;
-    pedidos[idx].status = status;
-    localStorage.setItem('ppr_pedidos', JSON.stringify(pedidos));
-    admRenderPedidos();
-    showToast('Status atualizado!');
-  }
-
-  function admClearPedidos() {
-    if (!confirm('Limpar todos os pedidos?')) return;
-    localStorage.removeItem('ppr_pedidos');
-    admRenderPedidos();
-  }
+  // admRenderPedidos/admSetStatus/admClearPedidos: substituídos pela versão Supabase no bloco abaixo
 
   function admRenderProducts() {
     const list = document.getElementById('adm-product-list');
@@ -3069,7 +2999,7 @@
         <div class="adm-product-icon">${p.icon}</div>
         <div class="adm-product-info">
           <div class="adm-product-name">${p.name}</div>
-          <div class="adm-product-meta">${p.category} · ${p.badge || 'sem badge'}</div>
+          <div class="adm-product-meta">${p.category}${p.subcategoria ? ' › ' + p.subcategoria : ''} · ${p.badge || 'sem badge'}</div>
         </div>
         <div class="adm-product-price">R$ ${p.price}</div>
         <div class="adm-product-actions">
@@ -3151,7 +3081,6 @@
       PRODUTOS.push(produtoAtualizado);
     }
 
-    localStorage.setItem('ppr_produtos', JSON.stringify(PRODUTOS));
     admCloseModal();
     admRenderProducts();
     renderProducts();
@@ -3169,7 +3098,6 @@
     if (!confirm('Excluir este produto?')) return;
     const idx = PRODUTOS.findIndex(x => x.id === id);
     if (idx >= 0) PRODUTOS.splice(idx, 1);
-    localStorage.setItem('ppr_produtos', JSON.stringify(PRODUTOS));
     admRenderProducts();
     renderProducts();
     try {
@@ -3327,8 +3255,12 @@
     if (ti) ti.addEventListener('input', admUpdateImgsPreview);
   });
 
-  function admLoadConfig() {
-    const cfg = JSON.parse(localStorage.getItem('ppr_config') || '{}');
+  async function admLoadConfig() {
+    let cfg = {};
+    try {
+      const rows = await sb('GET', 'config', null, '?chave=eq.ppr_config&limit=1');
+      if (rows.length) cfg = rows[0].valor;
+    } catch(e) {}
     document.getElementById('cfg-pix').value   = cfg.pix   || PIX_CHAVE;
     document.getElementById('cfg-nome').value  = cfg.nome  || PIX_NOME;
     document.getElementById('cfg-loja').value  = cfg.loja  || 'PPR Moda e Eletrônicos';
@@ -3344,14 +3276,13 @@
       wpp:   document.getElementById('cfg-wpp').value.trim(),
       frete: document.getElementById('cfg-frete').value.trim(),
     };
-    localStorage.setItem('ppr_config', JSON.stringify(cfg));
     if (cfg.pix)  PIX_CHAVE = cfg.pix;
     if (cfg.nome) PIX_NOME  = cfg.nome;
     try {
       await sbUpsertConfig('ppr_config', cfg);
       showToast('Configurações salvas! ✓');
     } catch(e) {
-      showToast('Configurações salvas localmente! ✓');
+      showToast('Erro ao salvar configurações.');
     }
   }
 
@@ -3360,7 +3291,6 @@
     const p2 = document.getElementById('cfg-pw2').value;
     if (!p1) { showToast('Digite a nova senha!'); return; }
     if (p1 !== p2) { showToast('Senhas não coincidem!'); return; }
-    localStorage.setItem('ppr_admin_pw', p1);
     document.getElementById('cfg-pw1').value = '';
     document.getElementById('cfg-pw2').value = '';
     try {
@@ -3381,7 +3311,7 @@
   // WhatsApp flutuante
   (function() {
     function updateWpp() {
-      const cfg = JSON.parse(localStorage.getItem('ppr_config') || '{}');
+      const cfg = JSON.parse(localStorage.getItem('ppr_config') || '{}'); // cache preenchido pelo Supabase no init
       const num = cfg.wpp || '5511999999999';
       const btn = document.getElementById('wpp-btn');
       if (btn) btn.href = `https://wa.me/${num.replace(/\D/g,'')}?text=Olá!%20Vim%20da%20loja%20PPR%20e%20quero%20saber%20mais%20sobre%20um%20produto.`;
@@ -3861,7 +3791,6 @@ async function sbUpsertProduto(p) {
     const cfgRows = await sb('GET', 'config', null, `?chave=eq.ppr_config&limit=1`);
     if (cfgRows.length) {
       const cfg = cfgRows[0].valor;
-      localStorage.setItem('ppr_config', JSON.stringify(cfg));
       if (cfg.pix)  PIX_CHAVE = cfg.pix;
       if (cfg.nome) PIX_NOME  = cfg.nome;
       if (cfg.wpp) {
@@ -3875,7 +3804,6 @@ async function sbUpsertProduto(p) {
     // Imagens
     const imgRows = await sb('GET', 'config', null, `?chave=eq.ppr_imgs&limit=1`);
     if (imgRows.length) {
-      localStorage.setItem('ppr_imgs', JSON.stringify(imgRows[0].valor));
       applyImgs();
     }
   } catch(e) {}
@@ -3885,6 +3813,19 @@ async function sbUpsertProduto(p) {
     const pwRows = await sb('GET', 'config', null, `?chave=eq.ppr_admin_pw&limit=1`);
     if (pwRows.length && pwRows[0].valor.pw) {
       localStorage.setItem('ppr_admin_pw', pwRows[0].valor.pw);
+    }
+  } catch(e) {}
+
+  try {
+    // Categorias & subcategorias
+    const catRows = await sb('GET', 'config', null, `?chave=eq.ppr_categorias&limit=1`);
+    if (catRows.length) {
+      _CATEGORIAS_CACHE = catRows[0].valor;
+      setTimeout(() => {
+        ['camisetas','moletons','calcas','acessorios','eletronicos'].forEach(c => {
+          if (typeof renderMobSubcats === 'function') renderMobSubcats(c);
+        });
+      }, 300);
     }
   } catch(e) {}
 
@@ -4049,7 +3990,7 @@ async function fazerLogin() {
 
 async function fazerLoginDireto(usuario) {
   usuarioLogado = usuario;
-  localStorage.setItem('ppr_sessao', JSON.stringify({ email: usuario.email, nome: usuario.nome }));
+  sessionStorage.setItem('ppr_sessao', JSON.stringify({ email: usuario.email, nome: usuario.nome }));
 
   // Carregar carrinho salvo (o campo carrinho pode vir direto no objeto do usuário)
   try {
@@ -4084,7 +4025,7 @@ async function fazerLogout() {
   saveWishlist();
   updateCartUI();
   renderProducts();
-  localStorage.removeItem('ppr_sessao');
+  sessionStorage.removeItem('ppr_sessao');
   atualizarBotaoConta();
   fecharModalConta();
   showToast('Você saiu da conta.');
@@ -4137,7 +4078,7 @@ salvarPedido = async function(tipo) {
   _salvarPedido_orig(tipo); // mantém localStorage como fallback local
   const items  = Object.values(cart);
   const total  = getTotal();
-  const dados  = JSON.parse(localStorage.getItem('ppr_dados_cliente') || '{}');
+  const dados  = JSON.parse(sessionStorage.getItem('ppr_dados_cliente') || '{}');
   const num    = 'PPR' + Date.now().toString().slice(-6);
   try {
     await sb('POST', 'pedidos', {
@@ -4228,7 +4169,7 @@ updateCartUI = function() {
 ══════════════════════════════════════ */
 (async function init() {
   // Tenta restaurar sessão salva
-  const sessao = localStorage.getItem('ppr_sessao');
+  const sessao = sessionStorage.getItem('ppr_sessao');
   if (!sessao) return;
   try {
     const s = JSON.parse(sessao);
@@ -4238,11 +4179,11 @@ updateCartUI = function() {
     if (rows.length) {
       await fazerLoginDireto(rows[0]);
     } else {
-      localStorage.removeItem('ppr_sessao');
+      sessionStorage.removeItem('ppr_sessao');
     }
   } catch(e) {
     console.warn('Sessão expirada:', e.message);
-    localStorage.removeItem('ppr_sessao');
+    sessionStorage.removeItem('ppr_sessao');
   }
 })();
 
@@ -4283,7 +4224,7 @@ function toggleMobAcc(cat) {
 function renderMobSubcats(cat) {
   const inner = document.getElementById('mob-sub-inner-' + cat);
   if (!inner) return;
-  const cats = JSON.parse(localStorage.getItem('ppr_categorias') || '{}');
+  const cats = _CATEGORIAS_CACHE || {};
   const subs = (cats[cat] && cats[cat].subcategorias) ? cats[cat].subcategorias : [];
   if (!subs.length) {
     inner.innerHTML = '<button class="mob-sub-btn" onclick="closeMobDrawer();filterCat(\'' + cat + '\');goPage(\'colecao\')">Todos os ' + cat + '</button>';
@@ -4388,6 +4329,7 @@ setTimeout(() => {
 /* ══════════════════════════════════════
    CATEGORIAS & SUBCATEGORIAS
 ══════════════════════════════════════ */
+let _CATEGORIAS_CACHE = null;
 function admGetCategorias() {
   const defaults = {
     camisetas:   { label:'Camisetas',   icon:'👕', subcategorias:[] },
@@ -4397,11 +4339,12 @@ function admGetCategorias() {
     eletronicos: { label:'Eletrônicos', icon:'🎧', subcategorias:[] },
     acessorios:  { label:'Acessórios',  icon:'🎩', subcategorias:[] },
   };
-  const saved = JSON.parse(localStorage.getItem('ppr_categorias') || '{}');
-  return Object.assign({}, defaults, saved);
+  return Object.assign({}, defaults, _CATEGORIAS_CACHE || {});
 }
-function admSaveCategorias(cats) {
-  localStorage.setItem('ppr_categorias', JSON.stringify(cats));
+async function admSaveCategorias(cats) {
+  _CATEGORIAS_CACHE = cats;
+  // salva no Supabase
+  try { await sbUpsertConfig('ppr_categorias', cats); } catch(e) { console.warn('Cats nao salvas no Supabase:', e.message); }
   // atualiza drawer mobile
   ['camisetas','moletons','calcas','acessorios','eletronicos'].forEach(c => renderMobSubcats(c));
 }
@@ -4492,7 +4435,6 @@ admSaveProduct = async function() {
       : PRODUTOS.length - 1;
     if (idx >= 0) {
       PRODUTOS[idx].subcategoria = subcat;
-      localStorage.setItem('ppr_produtos', JSON.stringify(PRODUTOS));
     }
   }
 };
@@ -4500,8 +4442,9 @@ admSaveProduct = async function() {
 /* ══════════════════════════════════════
    RELATÓRIOS
 ══════════════════════════════════════ */
-function admRenderRelatorios() {
-  const pedidos = JSON.parse(localStorage.getItem('ppr_pedidos') || '[]');
+async function admRenderRelatorios() {
+  let pedidos = [];
+  try { pedidos = await sb('GET', 'pedidos', null, '?order=criado_em.desc'); } catch(e) {}
   const total = pedidos.reduce((s, p) => s + (parseFloat(p.total) || 0), 0);
   const pagos  = pedidos.filter(p => p.status === 'pago');
   const totalPago = pagos.reduce((s, p) => s + (parseFloat(p.total) || 0), 0);
@@ -4518,7 +4461,7 @@ function admRenderRelatorios() {
   const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const porMes = new Array(12).fill(0);
   pedidos.forEach(p => {
-    const d = new Date(p.data ? p.data.split(' ')[0].split('/').reverse().join('-') : Date.now());
+    const d = new Date(p.criado_em || Date.now());
     if (!isNaN(d)) porMes[d.getMonth()] += (parseFloat(p.total) || 0);
   });
   const maxVal = Math.max(...porMes, 1);
