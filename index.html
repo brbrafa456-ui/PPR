@@ -4256,17 +4256,23 @@ filterCat = function(cat) {
 const _origRenderProducts = renderProducts;
 renderProducts = function() {
   if (!currentSubcat) { _origRenderProducts(); return; }
-  const filtroSalvo = filtroAtivo;
-  // filtra temporariamente por subcat
-  const original = [...PRODUTOS];
-  const filtered = PRODUTOS.filter(p => {
-    if (p.category !== filtroSalvo && filtroSalvo !== 'todos') return false;
-    return p.subcategoria === currentSubcat;
+  // filtra por categoria + subcategoria + preço, sem alterar PRODUTOS nem filtroAtivo
+  const lista = PRODUTOS.filter(p => {
+    if (filtroAtivo !== 'todos' && p.category !== filtroAtivo) return false;
+    if (p.subcategoria !== currentSubcat) return false;
+    if (p.price > maxPrice) return false;
+    return true;
   });
-  if (filtered.length === 0) { _origRenderProducts(); return; }
-  // swap temporario
-  PRODUTOS.length = 0; filtered.forEach(p => PRODUTOS.push(p));
-  const prevFiltro = filtroAtivo; filtroAtivo = 'todos';
+  const grid = document.getElementById('product-grid');
+  if (!lista.length) {
+    grid.innerHTML = '<p style="color:var(--muted);font-size:13px;">Nenhum produto nesta subcategoria.</p>';
+    return;
+  }
+  // reutiliza o renderizador original temporariamente com lista filtrada
+  const original = [...PRODUTOS];
+  const prevFiltro = filtroAtivo;
+  PRODUTOS.length = 0; lista.forEach(p => PRODUTOS.push(p));
+  filtroAtivo = 'todos';
   _origRenderProducts();
   filtroAtivo = prevFiltro;
   PRODUTOS.length = 0; original.forEach(p => PRODUTOS.push(p));
